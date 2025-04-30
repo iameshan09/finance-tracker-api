@@ -16,7 +16,8 @@ namespace finance_tracker_api.Services
                 Name = dto.Name,
                 Amount = dto.Amount,
                 Type = dto.Type,
-                Status = TransactionStatus.Active
+                Status = TransactionStatus.Active,
+                Date = dto.Date,
             };
             appDbContext.Transactions.Add(transaction);
             await appDbContext.SaveChangesAsync();
@@ -33,6 +34,7 @@ namespace finance_tracker_api.Services
             transaction.Name = dto.Name;
             transaction.Amount = dto.Amount;
             transaction.Type = dto.Type;
+            transaction.Date = dto.Date;
 
             await appDbContext.SaveChangesAsync();
             return transaction;
@@ -45,10 +47,14 @@ namespace finance_tracker_api.Services
 
             query = query.Where(t => t.Status == TransactionStatus.Active);
 
+            query = query.OrderByDescending(t => t.Id);
+
             if (dto.Type.HasValue)
             {
                 query = query.Where(t => t.Type == dto.Type.Value);
             }
+
+            
 
             var totalCount = await query.CountAsync();
 
